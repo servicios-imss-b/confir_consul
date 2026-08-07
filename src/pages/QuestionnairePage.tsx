@@ -593,9 +593,15 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           <p className="text-sm text-gray-500 mb-4">Indique cuántos consultorios tiene la unidad.</p>
           <div className="flex items-center gap-4">
             <input
-              type="number" min={0} max={50}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
               value={consultoriesCount}
-              onChange={(e) => setConsultoriesCount(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                setConsultoriesCount(val);
+              }}
               onBlur={(e) => {
                 const n = parseInt(e.target.value);
                 setConsultoriesCount(String(isNaN(n) ? 0 : Math.max(0, Math.min(50, n))));
@@ -627,9 +633,15 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
               </div>
             </div>
             <input
-              type="number" min={0} max={50}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              maxLength={2}
               value={nonOperativeCount}
-              onChange={(e) => setNonOperativeCount(e.target.value)}
+              onChange={(e) => {
+                const val = e.target.value.replace(/[^0-9]/g, '');
+                setNonOperativeCount(val);
+              }}
               onBlur={(e) => {
                 const n = parseInt(e.target.value);
                 setNonOperativeCount(String(isNaN(n) ? 0 : Math.max(0, Math.min(50, n))));
