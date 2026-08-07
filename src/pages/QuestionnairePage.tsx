@@ -222,7 +222,7 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           resolve();
         },
         () => {
-          setFetchError('Sin respuesta del servidor (45 s). Refresca la página — puede ser el primer acceso del día.');
+          setFetchError('Favor de refrescar la página, falló la conexión por internet.');
           resolve();
         },
         () => {}
@@ -322,6 +322,28 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
       </header>
 
       <main className="max-w-4xl mx-auto px-6 py-8 space-y-6">
+
+        {/* ===== INSTRUCCIONES — SIEMPRE VISIBLES AL INICIO ===== */}
+        <div className="rounded-xl p-4 border"
+          style={{ background: '#f0f8f6', borderColor: `${BRAND.forest}25` }}>
+          <p className="text-sm font-bold mb-2" style={{ color: BRAND.forest }}>
+            Instrucciones:
+          </p>
+          <ul className="space-y-1.5 text-sm" style={{ color: '#2d5f55' }}>
+            <li className="flex items-start gap-2">
+              <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>①</span>
+              Selecciona tu <strong>unidad médica</strong> en el buscador.
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>②</span>
+              Revisa y corrige el número de <strong>consultorios habilitados</strong> y los <strong>no operativos</strong>.
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="font-bold mt-0.5" style={{ color: BRAND.forest }}>③</span>
+              Si todo está correcto, presiona <strong>Guardar registro</strong>.
+            </li>
+          </ul>
+        </div>
 
         {/* ===== BANNER SIN INTERNET ===== */}
         {isOffline && (
@@ -584,30 +606,6 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
                 </div>
               );
             })}
-          </div>
-        )}
-
-        {/* ===== INSTRUCCIONES ===== */}
-        {selectedClues && (
-          <div className="rounded-xl p-4 border"
-            style={{ background: '#f0f8f6', borderColor: `${BRAND.forest}25` }}>
-            <p className="text-sm font-bold mb-2" style={{ color: BRAND.forest }}>
-              Antes de guardar, verifica la información:
-            </p>
-            <ul className="space-y-1.5 text-sm" style={{ color: '#2d5f55' }}>
-              <li className="flex items-start gap-2">
-                <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>①</span>
-                Revisa el número de <strong>consultorios habilitados</strong> — si no es correcto, cámbialo al valor real.
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>②</span>
-                Revisa los <strong>consultorios no operativos</strong> — corrígelo si es necesario.
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold mt-0.5" style={{ color: BRAND.forest }}>③</span>
-                Si todo está correcto, presiona <strong>{fromNuevaHoja ? 'Actualizar registro' : 'Guardar registro'}</strong>.
-              </li>
-            </ul>
           </div>
         )}
 
