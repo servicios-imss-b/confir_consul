@@ -222,7 +222,7 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           resolve();
         },
         () => {
-          setFetchError('Sin respuesta del servidor (45 s). Presiona "Reintentar" — puede ser el primer acceso del día.');
+          setFetchError('Sin respuesta del servidor (45 s). Refresca la página — puede ser el primer acceso del día.');
           resolve();
         },
         () => {}
@@ -587,6 +587,30 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           </div>
         )}
 
+        {/* ===== INSTRUCCIONES ===== */}
+        {selectedClues && (
+          <div className="rounded-xl p-4 border"
+            style={{ background: '#f0f8f6', borderColor: `${BRAND.forest}25` }}>
+            <p className="text-sm font-bold mb-2" style={{ color: BRAND.forest }}>
+              Antes de guardar, verifica la información:
+            </p>
+            <ul className="space-y-1.5 text-sm" style={{ color: '#2d5f55' }}>
+              <li className="flex items-start gap-2">
+                <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>①</span>
+                Revisa el número de <strong>consultorios habilitados</strong> — si no es correcto, cámbialo al valor real.
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>②</span>
+                Revisa los <strong>consultorios no operativos</strong> — corrígelo si es necesario.
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="font-bold mt-0.5" style={{ color: BRAND.forest }}>③</span>
+                Si todo está correcto, presiona <strong>{fromNuevaHoja ? 'Actualizar registro' : 'Guardar registro'}</strong>.
+              </li>
+            </ul>
+          </div>
+        )}
+
         {/* ===== CONSULTORIOS HABILITADOS ===== */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
           <h3 className="font-bold text-gray-800 mb-1">Consultorios generales habilitados</h3>
@@ -655,27 +679,6 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
         {/* ===== BOTÓN GUARDAR ===== */}
         {selectedClues && (
           <div className="space-y-4 pb-4">
-            {/* Instrucciones */}
-            <div className="rounded-xl p-4 border"
-              style={{ background: '#f0f8f6', borderColor: `${BRAND.forest}25` }}>
-              <p className="text-sm font-bold mb-2" style={{ color: BRAND.forest }}>
-                Antes de guardar, verifica la información:
-              </p>
-              <ul className="space-y-1.5 text-sm" style={{ color: '#2d5f55' }}>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>①</span>
-                  Revisa el número de <strong>consultorios habilitados</strong> — si no es correcto, cámbialo al valor real antes de continuar.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5" style={{ color: BRAND.gold }}>②</span>
-                  Revisa los <strong>consultorios no operativos</strong> — si el número es incorrecto, corrígelo.
-                </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold mt-0.5" style={{ color: BRAND.forest }}>③</span>
-                  Si toda la información es correcta, presiona <strong>{fromNuevaHoja ? 'Actualizar registro' : 'Guardar registro'}</strong>.
-                </li>
-              </ul>
-            </div>
 
             {/* Estado y botón */}
             <div className="flex items-center justify-between gap-3">
