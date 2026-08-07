@@ -12,7 +12,7 @@ const SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbwUcleq5TN8iHNJJXMIUlKUsVYKHjqASxYq4kjtt67q4JsKPQrK354pF5VjSHe80OtV/exec';
 
 // ← URL del Apps Script de guardado (nueva hoja)
-const SAVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxWBMz9Zz04kz4u4_GJR9Oqs1bYOsI75McA4t9Yz61Pr5YUzio_Zr2nFVJ2xkDDIf7v/exec';
+const SAVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxrc-cYAoi5q8Ya8HKLvF6ei8r_NcsDzOnGf64dbVNWpg8Lwhf0lE-nhTgyCBy2Wsn-/exec';
 
 interface Props {
   state: State;
@@ -594,9 +594,13 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           <p className="text-sm text-gray-500 mb-4">Indique cuántos consultorios tiene la unidad.</p>
           <div className="flex items-center gap-4">
             <input type="number" min={0} max={50} value={consultoriesCount}
-              onChange={(e) => setConsultoriesCount(Math.max(0, Math.min(50, Number(e.target.value) || 0)))}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '' || val === '-') return;
+                setConsultoriesCount(Math.max(0, Math.min(50, parseInt(val) || 0)));
+              }}
               className="w-28 px-3 py-3 text-xl font-bold text-center rounded-lg border border-gray-300 focus:outline-none tabular-nums"
-              onFocus={(e) => e.currentTarget.style.borderColor = BRAND.forest}
+              onFocus={(e) => { e.currentTarget.style.borderColor = BRAND.forest; e.currentTarget.select(); }}
               onBlur={(e) => e.currentTarget.style.borderColor = ''} />
             <span className="text-sm text-gray-500">
               {consultoriesCount === 0
@@ -622,8 +626,13 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
               </div>
             </div>
             <input type="number" min={0} max={50} value={nonOperativeCount}
-              onChange={(e) => setNonOperativeCount(Math.max(0, Math.min(50, Number(e.target.value) || 0)))}
+              onChange={(e) => {
+                const val = e.target.value;
+                if (val === '' || val === '-') return;
+                setNonOperativeCount(Math.max(0, Math.min(50, parseInt(val) || 0)));
+              }}
               className="w-24 px-3 py-3 text-center text-xl font-bold rounded-lg border bg-white focus:outline-none tabular-nums"
+              onFocus={(e) => e.currentTarget.select()}
               style={{ borderColor: `${BRAND.gold}60` }} />
           </div>
         </div>
