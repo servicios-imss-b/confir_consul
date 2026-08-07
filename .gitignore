@@ -21,6 +21,5 @@ dist-ssr
 *.sw?
 .env
 
-# No incluir el notebook ni datos exportados
-formu_angelesII.ipynb
+# No incluir datos exportados
 confir_consul/
