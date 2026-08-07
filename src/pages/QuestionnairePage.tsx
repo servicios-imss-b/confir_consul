@@ -108,7 +108,7 @@ function fetchDatos(
   let cancelled = false;
   const controller = new AbortController();
   // Timeout de 45 s — Apps Script puede tardar en "calentarse"
-  const timer = setTimeout(() => controller.abort(), 45000);
+  const timer = setTimeout(() => controller.abort(), 15000);
   fetch(
     SCRIPT_URL + '?accion=consultarDatosCompletos&clues_imb=' + encodeURIComponent(clues),
     { method: 'GET', mode: 'cors', signal: controller.signal }
@@ -527,53 +527,6 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
             </div>
           )}
         </div>
-
-        {/* ===== DATOS PRECARGADOS ===== */}
-        {!loadingData && apiData?.existe && datosUnidad && (
-          <div className="bg-white rounded-xl border shadow-sm overflow-hidden" style={{ borderColor: `${BRAND.forest}30` }}>
-            <div className="px-5 py-3 flex items-center justify-between"
-              style={{ background: BRAND.forestLight, borderBottom: `1px solid ${BRAND.forest}20` }}>
-              <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 flex-shrink-0" style={{ color: BRAND.forest }} />
-                <span className="font-bold text-sm truncate" style={{ color: BRAND.forest }}>
-                  {datosUnidad.nombre_de_la_unidad || selectedNombre || selectedClues}
-                </span>
-              </div>
-              <button
-                onClick={() => {
-                  // Borra caché para forzar fetch fresco del Google Sheet
-                  try { sessionStorage.removeItem(cacheKey(selectedClues)); } catch { /* */ }
-                  setLoadingData(true);
-                  setApiData(null);
-                  setFromCache(false);
-                  fetchDatos(
-                    selectedClues,
-                    (data, cached) => {
-                      setApiData(data);
-                      setFromCache(cached);
-                      if (data.existe && data.datos_unidad) {
-                        const hab = Number(data.datos_unidad.consultorios_habilitados);
-                        if (!isNaN(hab)) setConsultoriesCount(hab);
-                        const noOp = Number(data.datos_unidad.num_consultorios);
-                        if (!isNaN(noOp) && noOp >= 0) setNonOperativeCount(noOp);
-                      }
-                    },
-                    () => setFetchError('Sin respuesta del servidor (45 s). Presiona "Reintentar" — puede ser el primer acceso del día.'),
-                    () => setLoadingData(false)
-                  );
-                }}
-                className="flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-lg flex-shrink-0"
-                style={{ color: BRAND.forest, background: 'rgba(30,91,79,0.12)' }}>
-                <RefreshCw className="w-3 h-3" /> Actualizar
-              </button>
-            </div>
-            <div className="p-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <DataTile label="CLUES" value={selectedClues} />
-              <DataTile label="Categoría" value={datosUnidad.categoria_gerencial_ampliada} />
-              <DataTile label="Consultorios hab." value={datosUnidad.consultorios_habilitados} />
-            </div>
-          </div>
-        )}
 
         {/* ===== CONSULTORIOS GUARDADOS ===== */}
         {consultorios.length > 0 && (
