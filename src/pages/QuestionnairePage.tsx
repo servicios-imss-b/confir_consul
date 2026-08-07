@@ -107,31 +107,20 @@ function fetchDatos(
   }
   let cancelled = false;
   const controller = new AbortController();
-  // Timeout de 45 s (Apps Script puede tardar en "calentarse" desde GitHub Pages)
+  // Timeout de 45 s — Apps Script puede tardar en "calentarse"
   const timer = setTimeout(() => controller.abort(), 45000);
   fetch(
     SCRIPT_URL + '?accion=consultarDatosCompletos&clues_imb=' + encodeURIComponent(clues),
     { method: 'GET', mode: 'cors', signal: controller.signal }
   )
-    .then((r) => {
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      return r.json();
-    })
+    .then((r) => r.json())
     .then((d: ApiResponse) => {
       if (!cancelled) {
         setCache(clues, d);
         onData(d, false);
       }
     })
-    .catch((err) => {
-      if (!cancelled) {
-        const msg = err?.name === 'AbortError'
-          ? 'Tiempo de espera agotado (45 s). Intenta de nuevo — el servidor puede estar iniciando.'
-          : 'No se pudo conectar. Verifica tu conexión e intenta de nuevo.';
-        onError();
-        console.warn('fetchDatos error:', err, msg);
-      }
-    })
+    .catch(() => { if (!cancelled) onError(); })
     .finally(() => { clearTimeout(timer); if (!cancelled) onDone(); });
   return () => { cancelled = true; clearTimeout(timer); };
 }
@@ -233,7 +222,7 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           resolve();
         },
         () => {
-          setFetchError('Sin respuesta del servidor (15 s). El CLUES puede no estar en la base o hay problemas de conexión.');
+          setFetchError('Sin respuesta del servidor (45 s). Presiona "Reintentar" — puede ser el primer acceso del día.');
           resolve();
         },
         () => {}
@@ -523,19 +512,9 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
                 </div>
               )}
               {!loadingData && fetchError && (
-                <div className="rounded-lg px-3 py-2 text-xs font-medium space-y-2"
+                <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium"
                   style={{ background: '#fff3f3', color: BRAND.burgundy, border: `1px solid ${BRAND.burgundy}30` }}>
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-                    El servidor tardó demasiado. Puede ser la primera consulta del día (inicio en frío).
-                  </div>
-                  <button
-                    onClick={() => buscarClues(selectedClues)}
-                    className="text-xs font-bold underline"
-                    style={{ color: BRAND.burgundy }}
-                  >
-                    🔄 Reintentar
-                  </button>
+                  <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" /> {fetchError}
                 </div>
               )}
               {!loadingData && apiData && !apiData.existe && !fromNuevaHoja && (
@@ -579,7 +558,7 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
                         if (!isNaN(noOp) && noOp >= 0) setNonOperativeCount(noOp);
                       }
                     },
-                    () => setFetchError('Error al actualizar.'),
+                    () => setFetchError('Sin respuesta del servidor (45 s). Presiona "Reintentar" — puede ser el primer acceso del día.'),
                     () => setLoadingData(false)
                   );
                 }}
