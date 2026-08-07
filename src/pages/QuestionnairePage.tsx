@@ -12,7 +12,7 @@ const SCRIPT_URL =
   'https://script.google.com/macros/s/AKfycbwUcleq5TN8iHNJJXMIUlKUsVYKHjqASxYq4kjtt67q4JsKPQrK354pF5VjSHe80OtV/exec';
 
 // ← URL del Apps Script de guardado (nueva hoja)
-const SAVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx32hGHe_2IM71mFaKHrY3VQOvSAep5LnxihlR-HyiRs-qEFlpu0v0MOUpM7N0aJxWH/exec';
+const SAVE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzq3cC1CH86nlBlIvfeidIXRNxwTpIuAhd_2TgG4e82TM-Zl4qWJnEueALMZLGJCE3R/exec';
 
 interface Props {
   state: State;
