@@ -144,9 +144,9 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
     setDropPos({ top: r.bottom + 4, left: r.left, width: r.width });
   }, []);
 
-  // Formulario
-  const [consultoriesCount, setConsultoriesCount] = useState(0);
-  const [nonOperativeCount, setNonOperativeCount] = useState(0);
+  // Formulario — strings para permitir campo vacío al escribir
+  const [consultoriesCount, setConsultoriesCount] = useState<string>('0');
+  const [nonOperativeCount, setNonOperativeCount] = useState<string>('0');
 
   // API
   const [loadingData, setLoadingData] = useState(false);
@@ -191,8 +191,8 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
     setApiData(null);
     setFetchError(null);
     setExpanded(null);
-    setConsultoriesCount(0);
-    setNonOperativeCount(0);
+    setConsultoriesCount('0');
+    setNonOperativeCount('0');
     setSaveStatus('idle');
     setFromNuevaHoja(false);
 
@@ -215,9 +215,9 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           setFromCache(cached);
           if (data.existe && data.datos_unidad) {
             const hab = Number(data.datos_unidad.consultorios_habilitados);
-            if (!isNaN(hab) && hab >= 0) setConsultoriesCount(hab);
+            if (!isNaN(hab) && hab >= 0) setConsultoriesCount(String(hab));
             const noOp = Number(data.datos_unidad.num_consultorios);
-            if (!isNaN(noOp) && noOp >= 0) setNonOperativeCount(noOp);
+            if (!isNaN(noOp) && noOp >= 0) setNonOperativeCount(String(noOp));
           }
           resolve();
         },
@@ -232,11 +232,10 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
     // Ejecutar ambas en paralelo; nueva hoja sobreescribe si tiene datos más recientes
     Promise.all([consultarNuevaHoja, consultarBaseOriginal]).then(([nueva]) => {
       if (nueva?.existe) {
-        // La nueva hoja tiene datos → usarlos (son los más recientes)
         if (nueva.consultorios_habilitados != null)
-          setConsultoriesCount(Number(nueva.consultorios_habilitados));
+          setConsultoriesCount(String(Number(nueva.consultorios_habilitados)));
         if (nueva.consultorios_no_operativos != null)
-          setNonOperativeCount(Number(nueva.consultorios_no_operativos));
+          setNonOperativeCount(String(Number(nueva.consultorios_no_operativos)));
         setFromNuevaHoja(true);
       }
       setLoadingData(false);
@@ -256,8 +255,8 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
     setQuery('');
     setApiData(null);
     setFetchError(null);
-    setConsultoriesCount(0);
-    setNonOperativeCount(0);
+    setConsultoriesCount('0');
+    setNonOperativeCount('0');
     setSaveStatus('idle');
     setFromNuevaHoja(false);
     setTimeout(() => inputRef.current?.focus(), 50);
@@ -278,8 +277,8 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
       clues_imb:                selectedClues,
       nombre_de_la_unidad:      selectedNombre || datosUnidad?.nombre_de_la_unidad || '',
       categoria:                datosUnidad?.categoria_gerencial_ampliada || '',
-      consultorios_habilitados:    consultoriesCount,
-      consultorios_no_operativos:  nonOperativeCount,
+      consultorios_habilitados:    Number(consultoriesCount) || 0,
+      consultorios_no_operativos:  Number(nonOperativeCount) || 0,
     };
     fetch(SAVE_SCRIPT_URL, {
       method: 'POST',
@@ -593,19 +592,21 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
           <h3 className="font-bold text-gray-800 mb-1">Consultorios generales habilitados</h3>
           <p className="text-sm text-gray-500 mb-4">Indique cuántos consultorios tiene la unidad.</p>
           <div className="flex items-center gap-4">
-            <input type="number" min={0} max={50} value={consultoriesCount}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === '' || val === '-') return;
-                setConsultoriesCount(Math.max(0, Math.min(50, parseInt(val) || 0)));
+            <input
+              type="number" min={0} max={50}
+              value={consultoriesCount}
+              onChange={(e) => setConsultoriesCount(e.target.value)}
+              onBlur={(e) => {
+                const n = parseInt(e.target.value);
+                setConsultoriesCount(String(isNaN(n) ? 0 : Math.max(0, Math.min(50, n))));
+                e.currentTarget.style.borderColor = '';
               }}
               className="w-28 px-3 py-3 text-xl font-bold text-center rounded-lg border border-gray-300 focus:outline-none tabular-nums"
-              onFocus={(e) => { e.currentTarget.style.borderColor = BRAND.forest; e.currentTarget.select(); }}
-              onBlur={(e) => e.currentTarget.style.borderColor = ''} />
+              onFocus={(e) => { e.currentTarget.style.borderColor = BRAND.forest; e.currentTarget.select(); }} />
             <span className="text-sm text-gray-500">
-              {consultoriesCount === 0
+              {Number(consultoriesCount) === 0
                 ? <span className="font-medium" style={{ color: BRAND.forest }}>Sin consultorios registrados</span>
-                : <>{consultoriesCount} consultorio{consultoriesCount !== 1 ? 's' : ''}</>}
+                : <>{consultoriesCount} consultorio{Number(consultoriesCount) !== 1 ? 's' : ''}</>}
             </span>
           </div>
         </div>
@@ -621,15 +622,17 @@ export function QuestionnairePage({ state, entityName, email, onBack }: Props) {
                   Consultorios disponibles no operativos por turno debido a insuficiencia de personal
                 </p>
                 <p className="text-xs mt-1" style={{ color: '#7a6535' }}>
-                  Configurados: <span className="font-bold">{consultoriesCount}</span>
+                  Configurados: <span className="font-bold">{consultoriesCount || '0'}</span>
                 </p>
               </div>
             </div>
-            <input type="number" min={0} max={50} value={nonOperativeCount}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === '' || val === '-') return;
-                setNonOperativeCount(Math.max(0, Math.min(50, parseInt(val) || 0)));
+            <input
+              type="number" min={0} max={50}
+              value={nonOperativeCount}
+              onChange={(e) => setNonOperativeCount(e.target.value)}
+              onBlur={(e) => {
+                const n = parseInt(e.target.value);
+                setNonOperativeCount(String(isNaN(n) ? 0 : Math.max(0, Math.min(50, n))));
               }}
               className="w-24 px-3 py-3 text-center text-xl font-bold rounded-lg border bg-white focus:outline-none tabular-nums"
               onFocus={(e) => e.currentTarget.select()}
